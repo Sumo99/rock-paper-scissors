@@ -26,53 +26,35 @@ const rpsEnum = {
     "spock": 3,
     "lizard": 4
 }
+function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function calculatemarkovProbability(choice) {
-
-    let v1 = markovArray[rpsEnum[choice]][0]; //these are the probabilities for a row of paper or other symbol
-    let v2 = markovArray[rpsEnum[choice]][1];
-    let v3 = markovArray[rpsEnum[choice]][2];
-    let v4 = markovArray[rpsEnum[choice]][3];
-    let v5 = markovArray[rpsEnum[choice]][4];
-
-    let p1 = v1 / (v1 + v2 + v3 + v4 + v5);
-    let p2 = v2 / (v1 + v2 + v3 + v4 + v5);
-    let p3 = v3 / (v1 + v2 + v3 + v4 + v5);
-    let p4 = v4 / (v1 + v2 + v3 + v4 + v5);
-    let p5 = v5 / (v1 + v2 + v3 + v4 + v5);
-
-    console.log(markovArray)
-    if (isNaN(p1))
-        p1 = 0;
-
-    if (isNaN(p2))
-        p2 = 0;
-
-    if (isNaN(p3))
-        p3 = 0;
-    if (isNaN(p4))
-        p4 = 0;
-    if (isNaN(p5))
-        p5 = 0;
-
-
-    // get the largest probability 
-    let largest = Math.max.apply(Math, [p1, p2, p3, p4, p5]);
-
-    // bot chooses rock
-    if (largest === p1)
-        return "r";
+    let markovArraySlice = markovArray[rpsEnum[choice]] //get the row of the matrix corresponding with the choich
+    let maxIndex = markovArraySlice.indexOf(Math.max(...markovArraySlice)); //spread array and get maxindex
 
     // bot chooses paper
-    else if (largest === p2)
-        return "p";
-
-    // bot chooses scissors
-    else if (largest === p3)
-        return "s";
-    else if (largest === p4)
-        return "spock";
-    else if (largest === p5)
-        return "lizard";
+    if (maxIndex === 0) {
+        let rockWin = ["p", "spock"] //if the user picks rock then we can pick either paper or spock
+        return randomChoice(rockWin);
+    }
+    else if (maxIndex === 1) {
+        let paperWin = ["s", "lizard"] //paper is defeated by scissors or lizard
+        return randomChoice(paperWin);
+    }
+    else if (maxIndex === 2) {
+        let scissorsWin = ["r", "spock"]
+        return randomChoice(scissorsWin);
+    }
+    else if (maxIndex === 3) {
+        let spockWin = ["p", "lizard"] //win over spock
+        return randomChoice(spockWin);
+    }
+    else if (maxIndex === 4) {
+        let lizardWin = ["r", "s"]
+        return randomChoice(lizardWin);
+    }
 }
 function timetravel() {
 
@@ -130,7 +112,6 @@ function draw(userChoice, computerChoice, score = 0) {
 }
 
 function choose_winner(userChoice, computerChoice) {
-    //const computerChoice = getComputerChoice();
     if (userChoice === computerChoice) {
         draw(userChoice, computerChoice);
         return 0;
@@ -163,7 +144,7 @@ function game(userChoice, modifiers = "") {
     }
     else {
         lastUserChoice = currentChoice;
-        choose_winner(userChoice, calculatemarkovProbability(userChoice));
+        choose_winner(userChoice, calculatemarkovProbability(lastUserChoice));
         currentChoice = userChoice;
         markovArray[rpsEnum[lastUserChoice]][rpsEnum[currentChoice]]++;
     }
